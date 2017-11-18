@@ -544,7 +544,7 @@ static int parse_args(struct config *cfg, char **url, struct http_parser_url *pa
 }
 
 static void print_stats_header() {
-    printf("  Thread Stats%6s%11s%8s%12s\n", "Avg", "Stdev", "Max", "+/- Stdev");
+    printf("  Thread Stats%6s%11s%8s%12s%8s\n", "Avg", "Stdev", "Max", "+/- Stdev", "Min");
 }
 
 static void print_units(long double n, char *(*fmt)(long double), int width) {
@@ -561,6 +561,7 @@ static void print_units(long double n, char *(*fmt)(long double), int width) {
 }
 
 static void print_stats(char *name, stats *stats, char *(*fmt)(long double)) {
+    uint64_t min = stats->min;
     uint64_t max = stats->max;
     long double mean  = stats_mean(stats);
     long double stdev = stats_stdev(stats, mean);
@@ -569,7 +570,9 @@ static void print_stats(char *name, stats *stats, char *(*fmt)(long double)) {
     print_units(mean,  fmt, 8);
     print_units(stdev, fmt, 10);
     print_units(max,   fmt, 9);
-    printf("%8.2Lf%%\n", stats_within_stdev(stats, mean, stdev, 1));
+    printf("%8.2Lf%%", stats_within_stdev(stats, mean, stdev, 1));
+    print_units(min,   fmt, 9);
+    printf("\n");
 }
 
 static void print_stats_latency(stats *stats) {
